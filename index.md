@@ -4,38 +4,9 @@
 <head>
 <title>Rahmi Elibol</title>
 <!--<meta charset="iso-8859-1">-->
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-9">
-<link rel="stylesheet" href="styles/layout.css" type="text/css">
-<script src="scripts/jquery-1.8.2.min.js"></script>
-<script src="scripts/jquery-defaultvalue.js"></script>
-<!--[if lt IE 9]><script src="scripts/html5shiv.min.js"></script><![endif]-->
-</head>
-<div class="wrapper row1">
-	<header class="clear" id="header">
-		<hgroup>
-			<h1>
-				<a href="#">Rahmi Elibol</a></h1>
-			<h2><big>PhD</big></h2>
-		</hgroup>
-		<nav>
-			<ul>
-				<li class="first active">
-					<a href="index.html">Homepage</a></li>
-				<li>
-					<a href="research.html">Research</a></li>
-				<li>
-					<a href="contact.html">Contact</a></li>
 
-			</ul>
-		</nav>
-	</header>
-</div>
-<!-- content -->
-<div class="wrapper row2">
-	<div class="clear" id="container">
-		<div id="homepage">
-			<!-- Introduction -->
-			<section id="intro">
+</head>
+<body>
 				<big><big><img height="197" src="figs/re.png" width="167" /><br />
 				<br />
 				Middle East Technical University <br />
@@ -105,18 +76,5 @@ Elibol R., Sengor N.S. (2020) Modeling Nucleus Accumbens, Journal of Computation
 	<br />
 
 </section>
-		</div>
-	</div>
-	<!-- Copyright -->
-	<div class="wrapper row4">
-		<footer class="clear" id="copyright">
-			<p class="fl_left">
-				Copyright &copy; 2012 - All Rights Reserved - <a href="#">Domain Name</a></p>
-			<p class="fl_right">
-				Template by <a href="http://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p>
-		</footer>
-	</div>
-</div>
-<p>
-	&nbsp;</p>
-
+</body>
+</html>
