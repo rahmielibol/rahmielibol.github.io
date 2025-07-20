@@ -1,0 +1,607 @@
+
+<!DOCTYPE html>
+<html lang="en"> <!-- Default language set to English -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC Power Simulation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light gray background */
+        }
+        .chart-container {
+            position: relative;
+            height: 300px; /* Fixed height for charts */
+            width: 100%;
+        }
+        /* Custom Tailwind colors */
+        .bg-primary { background-color: #4f46e5; } /* Indigo 600 */
+        .text-primary { color: #4f46e5; }
+        .border-primary { border-color: #4f46e5; }
+    </style>
+</head>
+<body class="p-2 sm:p-4 md:p-6 flex flex-col items-center min-h-screen">
+    <div class="max-w-4xl w-full bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200">
+        <!-- Language Selector -->
+        <div class="flex justify-end mb-4">
+            <button id="lang-en" class="px-3 py-1 mr-2 rounded-md bg-primary text-white text-sm font-medium hover:bg-indigo-700 transition duration-200">EN</button>
+            <button id="lang-tr" class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition duration-200">TR</button>
+        </div>
+
+        <h1 id="main-title" class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-4">AC Power Simulation</h1>
+        <p id="description-text" class="text-center text-gray-600 mb-6 text-sm sm:text-base">
+            Adjust input values to observe changes in voltage, current, and power graphs, and examine power calculations.
+        </p>
+
+        <!-- Input Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="flex flex-col">
+                <label id="label-voltageRms" for="voltageRms" class="text-gray-700 font-medium mb-1 text-sm">RMS Voltage (Vrms):</label>
+                <input type="number" id="voltageRms" value="220" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 text-sm">
+            </div>
+            <div class="flex flex-col">
+                <label id="label-currentRms" for="currentRms" class="text-gray-700 font-medium mb-1 text-sm">RMS Current (Irms):</label>
+                <input type="number" id="currentRms" value="10" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 text-sm">
+            </div>
+            <div class="flex flex-col">
+                <label id="label-phaseDifference" for="phaseDifference" class="text-gray-700 font-medium mb-1 text-sm">Phase Difference (degrees):</label>
+                <input type="number" id="phaseDifference" value="0" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 text-sm">
+                <p id="hint-phaseDifference" class="text-xs text-gray-500 mt-1">Positive if current lags voltage, negative if it leads.</p>
+            </div>
+            <div class="flex flex-col">
+                <label id="label-frequency" for="frequency" class="text-gray-700 font-medium mb-1 text-sm">Frequency (Hz):</label>
+                <input type="number" id="frequency" value="50" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 text-sm">
+            </div>
+        </div>
+
+        <!-- Calculate Button -->
+        <button id="calculateBtn" class="w-full bg-primary text-white py-2 rounded-lg font-semibold text-base hover:bg-indigo-700 transition duration-300 shadow-md">
+            Generate Graphs and Calculate
+        </button>
+
+
+        <!-- Chart Areas -->
+        <div class="mt-6 space-y-6">
+            <!-- Voltage and Current Combined Chart -->
+            <div class="bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-200">
+                <h2 id="title-voltageCurrentChart" class="text-lg font-semibold text-gray-800 mb-3">Voltage and Current Graph (V(t) & I(t))</h2>
+                <div class="chart-container">
+                    <canvas id="voltageCurrentChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Power Chart Below -->
+            <div class="bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-200">
+                <h2 id="title-powerChart" class="text-lg font-semibold text-gray-800 mb-3">Power Graph (P(t))</h2>
+                <div class="chart-container">
+                    <canvas id="powerChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Power Calculations Result Area -->
+        <div class="mt-6 bg-blue-50 p-5 rounded-xl shadow-md border border-blue-200">
+            <h2 id="title-powerResults" class="text-lg font-semibold text-blue-800 mb-3">Power Calculations</h2>
+            <div id="powerResults" class="text-gray-700 leading-relaxed text-sm">
+                <p><span id="label-activePower">Active Power (P):</span> -</p>
+                <p><span id="label-reactivePower">Reactive Power (Q):</span> -</p>
+                <p><span id="label-apparentPower">Apparent Power (S):</span> -</p>
+                <p><span id="label-powerFactor">Power Factor (PF):</span> -</p>
+                <p><span id="label-impedance">Impedance (Z):</span> -</p>
+                <p><span id="label-resistance">Resistance (R):</span> -</p>
+                <p><span id="label-reactance">Reaktans (X):</span> -</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js chart objects
+        let voltageCurrentChart, powerChart;
+        let currentLanguage = 'en'; // Default language
+
+        // Translation object
+        const translations = {
+            en: {
+                title: 'AC Power Simulation',
+                description: 'Adjust input values to observe changes in voltage, current, and power graphs, and examine power calculations.',
+                labelVoltageRms: 'RMS Voltage (Vrms):',
+                labelCurrentRms: 'RMS Current (Irms):',
+                labelPhaseDifference: 'Phase Difference (degrees):',
+                hintPhaseDifference: 'Positive if current lags voltage, negative if it leads.',
+                labelFrequency: 'Frequency (Hz):',
+                calculateBtn: 'Generate Graphs and Calculate',
+                titleVoltageCurrentChart: 'Voltage and Current Graph (V(t) & I(t))',
+                titlePowerChart: 'Power Graph (P(t))',
+                titlePowerResults: 'Power Calculations',
+                labelActivePower: 'Active Power (P):',
+                labelReactivePower: 'Reactive Power (Q):',
+                labelApparentPower: 'Apparent Power (S):',
+                labelPowerFactor: 'Power Factor (PF):',
+                labelImpedance: 'Impedance (Z):',
+                labelResistance: 'Resistance (R):',
+                labelReactance: 'Reactance (X):',
+                formula: 'Formula:',
+                calculation: 'Calculation:',
+                result: 'Result:',
+                voltageUnit: 'Voltage (V)',
+                currentUnit: 'Current (A)',
+                powerUnit: 'Power (W)',
+                timeUnit: 'Time (s)', // Added for X-axis title
+                errorMessage: 'Please enter valid numerical values and ensure frequency is greater than zero.'
+            },
+            tr: {
+                title: 'Alternatif Akım Güç Benzetimi',
+                description: 'Giriş değerlerini ayarlayarak gerilim, akım ve güç grafiklerinin nasıl değiştiğini gözlemleyin ve güç hesaplamalarını inceleyin.',
+                labelVoltageRms: 'Gerilimin Etkin Değeri (Vrms):',
+                labelCurrentRms: 'Akımın Etkin Değeri (Irms):',
+                labelPhaseDifference: 'Faz Farkı (derece):',
+                hintPhaseDifference: 'Akım gerilime göre gecikiyorsa pozitif, ilerliyorsa negatif.',
+                labelFrequency: 'Frekans (Hz):',
+                calculateBtn: 'Grafikleri Oluştur ve Hesapla',
+                titleVoltageCurrentChart: 'Gerilim ve Akım Grafiği (V(t) & I(t))',
+                titlePowerChart: 'Güç Grafiği (P(t))',
+                titlePowerResults: 'Güç Hesaplamaları',
+                labelActivePower: 'Aktif Güç (P):',
+                labelReactivePower: 'Reaktif Güç (Q):',
+                labelApparentPower: 'Görünür Güç (S):',
+                labelPowerFactor: 'Güç Faktörü (PF):',
+                labelImpedance: 'Empedans (Z):',
+                labelResistance: 'Direnç (R):',
+                labelReactance: 'Reaktans (X):',
+                formula: 'Formül:',
+                calculation: 'Hesaplama:',
+                result: 'Sonuç:',
+                voltageUnit: 'Gerilim (V)',
+                currentUnit: 'Akım (A)',
+                powerUnit: 'Güç (W)',
+                timeUnit: 'Zaman (s)', // Added for X-axis title
+                errorMessage: 'Lütfen geçerli sayısal değerler girin ve frekansın sıfırdan büyük olduğundan emin olun.'
+            }
+        };
+
+        /**
+         * Sets the language of the page.
+         * @param {string} lang - The language code ('en' or 'tr').
+         */
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            const t = translations[lang];
+
+            // Update static texts
+            document.getElementById('main-title').textContent = t.title;
+            document.getElementById('description-text').textContent = t.description;
+            document.getElementById('label-voltageRms').textContent = t.labelVoltageRms;
+            document.getElementById('label-currentRms').textContent = t.labelCurrentRms;
+            document.getElementById('label-phaseDifference').textContent = t.labelPhaseDifference;
+            document.getElementById('hint-phaseDifference').textContent = t.hintPhaseDifference;
+            document.getElementById('label-frequency').textContent = t.labelFrequency;
+            document.getElementById('calculateBtn').textContent = t.calculateBtn;
+            document.getElementById('title-voltageCurrentChart').textContent = t.titleVoltageCurrentChart;
+            document.getElementById('title-powerChart').textContent = t.titlePowerChart;
+            document.getElementById('title-powerResults').textContent = t.titlePowerResults;
+
+            // Update chart Y-axis titles
+            if (voltageCurrentChart) {
+                voltageCurrentChart.options.scales.yVoltage.title.text = t.voltageUnit;
+                voltageCurrentChart.options.scales.yCurrent.title.text = t.currentUnit;
+                // Update X-axis title for combined chart
+                voltageCurrentChart.options.scales.x.title.text = t.timeUnit;
+            }
+            if (powerChart) {
+                powerChart.options.scales.y.title.text = t.powerUnit;
+                // Update X-axis title for power chart
+                powerChart.options.scales.x.title.text = t.timeUnit;
+            }
+
+            // Update button styles
+            document.getElementById('lang-en').classList.remove('bg-primary', 'text-white', 'bg-gray-200', 'text-gray-700');
+            document.getElementById('lang-tr').classList.remove('bg-primary', 'text-white', 'bg-gray-200', 'text-gray-700');
+
+            if (lang === 'en') {
+                document.getElementById('lang-en').classList.add('bg-primary', 'text-white');
+                document.getElementById('lang-tr').classList.add('bg-gray-200', 'text-gray-700');
+            } else {
+                document.getElementById('lang-tr').classList.add('bg-primary', 'text-white');
+                document.getElementById('lang-en').classList.add('bg-gray-200', 'text-gray-700');
+            }
+
+            // Re-run calculations to update dynamic text in power results and chart titles
+            updateChartsAndCalculations();
+        }
+
+        // Sayfa yüklendiğinde çalışacak fonksiyon
+        window.onload = function() {
+            // Initial chart creation
+            createCharts();
+            // Set default language to English
+            setLanguage('en'); // This call will also trigger updateChartsAndCalculations()
+
+            // Add event listeners for language buttons
+            document.getElementById('lang-en').addEventListener('click', () => setLanguage('en'));
+            document.getElementById('lang-tr').addEventListener('click', () => setLanguage('tr'));
+
+            // Add event listener for calculate button
+            document.getElementById('calculateBtn').addEventListener('click', updateChartsAndCalculations);
+        };
+
+        /**
+         * Creates empty chart objects initially.
+         * Data sets are defined for instantaneous values, RMS values, and peak values for each chart.
+         * Zero crossing points have been removed.
+         */
+        function createCharts() {
+            const commonChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false, // Hide legends
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: translations[currentLanguage].timeUnit, // Updated to use timeUnit
+                            font: {
+                                size: 16
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        },
+                        ticks: { // Hide X-axis labels
+                            display: false
+                        }
+                    },
+                    // Y-axes will be defined specifically for each chart
+                }
+            };
+
+            // Voltage and Current Combined Chart
+            const combinedCtx = document.getElementById('voltageCurrentChart').getContext('2d');
+            voltageCurrentChart = new Chart(combinedCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                    {
+                        label: 'Instantaneous Voltage V(t)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'yVoltage' // Left axis for Voltage
+                    },
+                    {
+                        label: 'RMS Voltage Vrms',
+                        borderColor: 'rgb(0, 150, 150)',
+                        borderDash: [5, 5],
+                        borderWidth: 3,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'yVoltage'
+                    },
+                    {
+                        label: 'Peak Voltage Vp',
+                        borderColor: 'rgba(75, 192, 192, 0.5)',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'yVoltage'
+                    },
+                    {
+                        label: '-Peak Voltage -Vp',
+                        borderColor: 'rgba(75, 192, 192, 0.5)',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'yVoltage'
+                    },
+                    {
+                        label: 'Instantaneous Current I(t)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'yCurrent' // Right axis for Current
+                    },
+                    {
+                        label: 'RMS Current Irms',
+                        borderColor: 'rgb(200, 50, 90)',
+                        borderDash: [5, 5],
+                        borderWidth: 3,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'yCurrent'
+                    },
+                    {
+                        label: 'Peak Current Ip',
+                        borderColor: 'rgba(255, 99, 132, 0.5)',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'yCurrent'
+                    },
+                    {
+                        label: '-Peak Current -Ip',
+                        borderColor: 'rgba(255, 99, 132, 0.5)',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'yCurrent'
+                    }
+                    ]
+                },
+                options: {
+                    ...commonChartOptions,
+                    scales: {
+                        x: {
+                            ...commonChartOptions.scales.x,
+                            ticks: {
+                                display: false
+                            }
+                        },
+                        yVoltage: { // Left Y-axis (Voltage)
+                            type: 'linear',
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: translations[currentLanguage].voltageUnit,
+                                font: {
+                                    size: 16
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)',
+                                zeroLineWidth: 3,
+                                zeroLineColor: 'rgba(0, 0, 0, 0.8)'
+                            }
+                        },
+                        yCurrent: { // Right Y-axis (Current)
+                            type: 'linear',
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: translations[currentLanguage].currentUnit,
+                                font: {
+                                    size: 16
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)',
+                                zeroLineWidth: 3,
+                                zeroLineColor: 'rgba(0, 0, 0, 0.8)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Power Chart
+            const powerCtx = document.getElementById('powerChart').getContext('2d');
+            powerChart = new Chart(powerCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Instantaneous Power P(t)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Average Power (Active Power)',
+                        borderColor: 'rgb(0, 100, 200)', // More distinct color
+                        borderDash: [5, 5],
+                        borderWidth: 3, // Thicker line
+                        fill: false,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Peak Power P_peak',
+                        borderColor: 'rgba(54, 162, 235, 0.5)',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0
+                    },
+                    {
+                        label: '-Peak Power -P_peak',
+                        borderColor: 'rgba(54, 162, 235, 0.5)',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    ...commonChartOptions,
+                    scales: {
+                        x: { // X-axis settings
+                            ...commonChartOptions.scales.x,
+                            ticks: { // Hide X-axis labels
+                                display: false
+                            }
+                        },
+                        y: {
+                            ...commonChartOptions.scales.y,
+                            title: {
+                                display: true,
+                                text: translations[currentLanguage].powerUnit // Will be updated by setLanguage
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Retrieves input values, performs calculations, and updates charts.
+         */
+        function updateChartsAndCalculations() {
+            const t = translations[currentLanguage]; // Get current language translations
+
+            // Get input values
+            const Vrms = parseFloat(document.getElementById('voltageRms').value);
+            const Irms = parseFloat(document.getElementById('currentRms').value);
+            const phaseDeg = parseFloat(document.getElementById('phaseDifference').value);
+            const frequency = parseFloat(document.getElementById('frequency').value);
+
+            // Invalid input control
+            if (isNaN(Vrms) || isNaN(Irms) || isNaN(phaseDeg) || isNaN(frequency) || frequency <= 0) {
+                document.getElementById('powerResults').innerHTML = `<p class="text-red-600">${t.errorMessage}</p>`;
+                // Clear charts
+                voltageCurrentChart.data.labels = [];
+                voltageCurrentChart.data.datasets.forEach(dataset => dataset.data = []);
+                voltageCurrentChart.update();
+
+                powerChart.data.labels = [];
+                powerChart.data.datasets.forEach(dataset => dataset.data = []);
+                powerChart.update();
+                return;
+            }
+
+            // Convert degrees to radians
+            const phaseRad = phaseDeg * (Math.PI / 180);
+
+            // Calculate peak values
+            const Vp = Vrms * Math.sqrt(2);
+            const Ip = Irms * Math.sqrt(2);
+
+            // Calculate period (time interval for 2 periods)
+            const period = 1 / frequency;
+            const timeEnd = 2 * period; // 2 periods duration
+            const numPoints = 500; // Number of points for the graph
+            const timeStep = timeEnd / numPoints;
+
+            let timeData = [];
+            let voltageData = [];
+            let currentData = [];
+            let powerData = [];
+
+            let maxPower = 0; // To find the peak value of instantaneous power
+
+            for (let i = 0; i <= numPoints; i++) {
+                const t_val = i * timeStep; // Use t_val to avoid conflict with translation object 't'
+                timeData.push(t_val);
+
+                // Instantaneous voltage: V(t) = Vp * sin(2 * PI * f * t)
+                const v_t = Vp * Math.sin(2 * Math.PI * frequency * t_val);
+                voltageData.push(v_t);
+
+                // Instantaneous current: I(t) = Ip * Math.sin(2 * Math.PI * frequency * t - phi)
+                const i_t = Ip * Math.sin(2 * Math.PI * frequency * t_val - phaseRad);
+                currentData.push(i_t);
+
+                // Instantaneous power: P(t) = V(t) * I(t)
+                const p_t = v_t * i_t;
+                powerData.push(p_t);
+
+                // Find the maximum value of instantaneous power
+                if (Math.abs(p_t) > maxPower) {
+                    maxPower = Math.abs(p_t);
+                }
+            }
+
+            // Active, Reactive, and Apparent Power calculations
+            const P = Vrms * Irms * Math.cos(phaseRad); // Active Power
+            const Q = Vrms * Irms * Math.sin(phaseRad); // Reactive Power
+            const S = Vrms * Irms; // Apparent Power
+
+            // Power Factor (PF) calculation
+            const PF = Math.cos(phaseRad); // PF = cos(phi)
+
+            // Empedans (Z) calculation
+            let Z = 0;
+            if (Irms !== 0) { // Calculate if current is not zero
+                Z = Vrms / Irms;
+            } else {
+                Z = Infinity; // If current is zero, impedance is infinite
+            }
+
+            // Resistance (R) and Reactance (X) calculations
+            const R = Z * Math.cos(phaseRad); // R = Z * cos(phi)
+            const X = Z * Math.sin(phaseRad); // X = Z * sin(phi)
+
+           // Write power calculations to the text box with formulas and values
+            document.getElementById('powerResults').innerHTML = `
+                <p><strong>${t.labelActivePower}</strong></p>
+                <p class="ml-4">${t.formula} P = V<sub>rms</sub> &times; I<sub>rms</sub> &times; cos(&phi;)</p>
+                <p class="ml-4">${t.calculation} P = ${P.toFixed(3)} W</p>
+                <br>
+                <p><strong>${t.labelReactivePower}</strong></p>
+                <p class="ml-4">${t.formula} Q = V<sub>rms</sub> &times; I<sub>rms</sub> &times; sin(&phi;)</p>
+                <p class="ml-4">${t.calculation} Q = ${Q.toFixed(3)} VAR</p>
+                <br>
+                <p><strong>${t.labelApparentPower}</strong></p>
+                <p class="ml-4">${t.formula} S = V<sub>rms</sub> &times; I<sub>rms</sub></p>
+                <p class="ml-4">${t.calculation} S = ${S.toFixed(3)} VA</p>
+                <br>
+                <p><strong>${t.labelPowerFactor}</strong></p>
+                <p class="ml-4">${t.formula} PF = cos(&phi;)</p>
+                <p class="ml-4">${t.calculation} PF = ${PF.toFixed(3)}</p>
+                <br>
+                <p><strong>${t.labelImpedance}</strong></p>
+                <p class="ml-4">${t.formula} Z = V<sub>rms</sub> / I<sub>rms</sub></p>
+                <p class="ml-4">${t.calculation} Z = ${Z.toFixed(3)} &Omega;</p>
+                <br>
+                <p><strong>${t.labelResistance}</strong></p>
+                <p class="ml-4">${t.formula} R = Z &times; cos(&phi;)</p>
+                <p class="ml-4">${t.calculation} R = ${R.toFixed(3)} &Omega;</p>
+                <br>
+                <p><strong>${t.labelReactance}</strong></p>
+                <p class="ml-4">${t.formula} X = Z &times; sin(&phi;)</p>
+                <p class="ml-4">${t.calculation} X = ${X.toFixed(3)} &Omega;</p>
+            `;
+
+            // Update Voltage and Current Combined Chart data
+            voltageCurrentChart.data.labels = timeData;
+            voltageCurrentChart.data.datasets[0].data = voltageData; // Instantaneous Voltage
+            voltageCurrentChart.data.datasets[1].data = Array(numPoints + 1).fill(Vrms); // RMS Voltage
+            voltageCurrentChart.data.datasets[2].data = Array(numPoints + 1).fill(Vp); // Peak Voltage
+            voltageCurrentChart.data.datasets[3].data = Array(numPoints + 1).fill(-Vp); // -Peak Voltage
+            voltageCurrentChart.data.datasets[4].data = currentData; // Instantaneous Current
+            voltageCurrentChart.data.datasets[5].data = Array(numPoints + 1).fill(Irms); // RMS Current
+            voltageCurrentChart.data.datasets[6].data = Array(numPoints + 1).fill(Ip); // Peak Current
+            voltageCurrentChart.data.datasets[7].data = Array(numPoints + 1).fill(-Ip); // -Peak Current
+
+            // Update Y-axis titles for the combined chart
+            voltageCurrentChart.options.scales.yVoltage.title.text = `${t.voltageUnit} (Vp: ${Vp.toFixed(2)}V, Vrms: ${Vrms.toFixed(2)}V)`;
+            voltageCurrentChart.options.scales.yCurrent.title.text = `${t.currentUnit} (Ip: ${Ip.toFixed(2)}A, Irms: ${Irms.toFixed(2)}A)`;
+            voltageCurrentChart.update();
+
+            // Update Power Chart data
+            powerChart.data.labels = timeData;
+            powerChart.data.datasets[0].data = powerData; // Instantaneous Power
+            powerChart.data.datasets[1].data = Array(numPoints + 1).fill(P); // Average Power (Active Power)
+            powerChart.data.datasets[2].data = Array(numPoints + 1).fill(maxPower); // Peak Power
+            powerChart.data.datasets[3].data = Array(numPoints + 1).fill(-maxPower); // -Peak Power
+            powerChart.options.scales.y.title.text = `${t.powerUnit} (P_peak: ${maxPower.toFixed(2)}W)`;
+            powerChart.update();
+        }
+    </script>
+</body>
+</html>
