@@ -33,6 +33,15 @@
             transition: opacity 0.3s ease-in-out;
             z-index: 1000;
         }
+        /* Yukarı çık butonu için stil */
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 999;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col justify-center items-center p-4">
@@ -72,9 +81,16 @@
                     <p class="text-gray-600 mb-4">
                         Motor hesaplamalarına yönelik olarak geliştirilen mobil uygulama, deneysel verilerin analizi için bir araç sunmaktadır.
                     </p>
-                    <a href="https://rahmielibol.github.io/projects/2209a/cd.apk" id="apk-download" onclick="showMessage('Mobil cihazınız (Android) için kurulum dosyasıdır.'); return false;" class="inline-block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-300 transform hover:scale-105">
-                        .apk Dosyasını İndir
-                    </a>
+                    <div class="flex items-center space-x-2">
+                        <a href="https://rahmielibol.github.io/projects/2209a/cd.apk" id="apk-download" class="inline-block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-300 transform hover:scale-105">
+                            .apk Dosyasını İndir
+                        </a>
+                        <button id="copy-apk-link" class="p-3 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors duration-300 transform hover:scale-105" aria-label="Kopyala">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-2m-3-12h3m-3 0V5a2 2 0 00-2-2H9a2 2 0 00-2 2v2m8 0v2H7V7h8z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Web Sayfası Kartı -->
@@ -89,9 +105,16 @@
                     <p class="text-gray-600 mb-4">
                         "İnteraktif Asenkron Motor Daire Diyagramı" başlıklı web sayfası, motor performansının daire diyagramı üzerinden görselleştirilmesini sağlar.
                     </p>
-                    <a href="https://rahmielibol.github.io/projects/2209a/cd.html" id="___cd" onclick="showMessage('Daire diyagramı sayfasına bağlanacaktır.'); return false;" class="inline-block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-300 transform hover:scale-105">
-                        Web Sayfasını Ziyaret Et
-                    </a>
+                    <div class="flex items-center space-x-2">
+                        <a href="https://rahmielibol.github.io/projects/2209a/cd.html" id="cd-link" class="inline-block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-300 transform hover:scale-105">
+                            Web Sayfasını Ziyaret Et
+                        </a>
+                        <button id="copy-cd-link" class="p-3 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors duration-300 transform hover:scale-105" aria-label="Kopyala">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-2m-3-12h3m-3 0V5a2 2 0 00-2-2H9a2 2 0 00-2 2v2m8 0v2H7V7h8z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -156,13 +179,20 @@
         <!-- Alt Bilgi (Footer) -->
         <footer class="bg-gray-200 text-center text-gray-600 p-4 md:p-6">
             <p>&copy; 2024 TÜBİTAK-2209-A Projesi <br>
-Hacettepe Üniversitesi Ankara Sanayi Odası 1.OSB Meslek Yüksek Okulu <br>
-Tüm hakları saklıdır.</p>
+            Hacettepe Üniversitesi Ankara Sanayi Odası 1.OSB Meslek Yüksek Okulu <br>
+            Tüm hakları saklıdır.</p>
         </footer>
     </div>
 
     <!-- Mesaj Kutusu -->
     <div id="message-box"></div>
+
+    <!-- Yukarı Çık Butonu -->
+    <button id="back-to-top" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-colors duration-300" aria-label="Sayfanın en üstüne git">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+    </button>
 
     <script>
         /**
@@ -177,6 +207,74 @@ Tüm hakları saklıdır.</p>
                 messageBox.style.opacity = '0';
             }, 3000); // 3 saniye sonra kaybolur.
         }
+
+        /**
+         * Belirtilen metni panoya kopyalar.
+         * @param {string} text - Panoya kopyalanacak metin.
+         */
+        function copyToClipboard(text) {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const apkDownloadLink = document.getElementById('apk-download');
+            const cdLink = document.getElementById('cd-link');
+            const copyApkButton = document.getElementById('copy-apk-link');
+            const copyCdButton = document.getElementById('copy-cd-link');
+            const backToTopButton = document.getElementById('back-to-top');
+
+            // İndirme bağlantılarına tıklandığında mesaj göster.
+            apkDownloadLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showMessage('Mobil cihazınız (Android) için kurulum dosyasıdır.');
+                // Linke yönlendirme işlemini setTimeout ile yapıyoruz, böylece mesaj göründükten sonra indirme başlar.
+                setTimeout(() => {
+                    window.location.href = apkDownloadLink.href;
+                }, 500);
+            });
+
+            cdLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showMessage('Daire diyagramı sayfasına bağlanacaktır.');
+                setTimeout(() => {
+                    window.location.href = cdLink.href;
+                }, 500);
+            });
+
+            // Kopyalama butonlarına tıklama olaylarını ekle.
+            copyApkButton.addEventListener('click', () => {
+                const url = apkDownloadLink.href;
+                copyToClipboard(url);
+                showMessage('APK bağlantısı panoya kopyalandı!');
+            });
+
+            copyCdButton.addEventListener('click', () => {
+                const url = cdLink.href;
+                copyToClipboard(url);
+                showMessage('Web sayfası bağlantısı panoya kopyalandı!');
+            });
+
+            // Yukarı çık butonu görünürlüğünü ve işlevini kontrol et.
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 200) {
+                    backToTopButton.style.opacity = '1';
+                } else {
+                    backToTopButton.style.opacity = '0';
+                }
+            });
+
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
     </script>
 </body>
 </html>
