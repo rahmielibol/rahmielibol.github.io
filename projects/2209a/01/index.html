@@ -67,6 +67,68 @@
                 </p>
             </section>
 
+<!-- İş paketlerinin stilini tanımlayan CSS kodu. Bunu sayfanızın <style> etiketine ekleyin. -->
+<style>
+    /* İş paketi için kart stili */
+    .task-card {
+        background-color: #fff;
+        color: #1f2937;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 0.75rem; /* rounded-xl */
+        padding: 1.5rem; /* p-6 */
+        transition: transform 0.3s ease-in-out;
+    }
+    .task-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+
+<!-- Proje İş Paketleri - Renkli ve Yola Benzer Tasarım -->
+<section class="mb-8">
+    <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Proje İş Paketleri</h2>
+    <p class="text-center mb-6 text-gray-600">Proje kapsamında, 6 aylık süre boyunca planlanan dört ana iş paketi (İP) başarıyla tamamlanmıştır.</p>
+    <div class="flex flex-col md:flex-row items-center justify-center space-y-6 md:space-y-0 md:space-x-4">
+        <!-- İş Paketi 1 -->
+        <div class="task-card bg-green-500 text-white">
+            <h3 class="font-bold mb-2 text-lg">İP1 - Teorik İnceleme</h3>
+            <p class="text-sm">(Mart - Nisan 2025)</p>
+            <p class="text-xs mt-2">İndüksiyon motorlarının eşdeğer devre, kayıp hesaplamaları ve daire diyagramı çizimlerinin teorik temelleri detaylı olarak incelenmiştir.</p>
+        </div>
+
+        <!-- Ok Simgesi -->
+        <svg class="hidden md:block w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        
+        <!-- İş Paketi 2 -->
+        <div class="task-card bg-blue-500 text-white">
+            <h3 class="font-bold mb-2 text-lg">İP2 - Mobil Uygulama Geliştirme</h3>
+            <p class="text-sm">(Nisan - Haziran 2025)</p>
+            <p class="text-xs mt-2">MIT App Inventor platformu kullanılarak, motor hesaplamalarını blok tabanlı kodlamaya dönüştüren bir mobil uygulama geliştirilmiştir.</p>
+        </div>
+
+        <!-- Ok Simgesi -->
+        <svg class="hidden md:block w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        
+        <!-- İş Paketi 3 -->
+        <div class="task-card bg-amber-500 text-white">
+            <h3 class="font-bold mb-2 text-lg">İP3 - Grafik Arayüz ve Veri Gösterimi</h3>
+            <p class="text-sm">(Mayıs - Haziran 2025)</p>
+            <p class="text-xs mt-2">Hesaplama sonuçları, motorun verim sınıfı ve dinamik daire diyagramı gibi grafiksel arayüzlerle görselleştirilerek mobil uygulamaya entegre edilmiştir.</p>
+        </div>
+
+        <!-- Ok Simgesi -->
+        <svg class="hidden md:block w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        
+        <!-- İş Paketi 4 -->
+        <div class="task-card bg-purple-500 text-white">
+            <h3 class="font-bold mb-2 text-lg">İP4 - Test ve Yayınlama</h3>
+            <p class="text-sm">(Haziran - Ağustos 2025)</p>
+            <p class="text-xs mt-2">Uygulamanın işlevsellik ve doğruluk testleri yapılmış, belirlenen hatalar giderilerek proje son haline getirilmiş ve yayınlanmıştır.</p>
+        </div>
+    </div>
+</section>
+
+            
+
             <!-- Uygulama ve Web Sayfası Bağlantıları -->
             <section class="grid md:grid-cols-2 gap-6 mb-8">
                 <!-- Mobil Uygulama Kartı -->
