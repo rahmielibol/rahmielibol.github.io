@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TÜBİTAK 2209-A Projesi: İndüksiyon Motorları Mobil Uygulama ve Daire Diyagramı Web Sayfası</title>
+    <!-- Sayfa Açıklaması (Arama motoru sonuçlarında görünür) -->
+    <meta name="description" content="TÜBİTAK 2209-A projesi kapsamında geliştirilen indüksiyon motorları hesaplama mobil uygulaması ve interaktif daire diyagramı web sayfası.">
+    <!-- Anahtar Kelimeler (İçeriği özetler, arama motorlarına yardımcı olur) -->
+    <meta name="keywords" content="TÜBİTAK 2209-A, indüksiyon motorları, daire diyagramı, mobil uygulama, elektrik motoru hesapları, enerji verimliliği, asenkron motor, Rahmi Elibol, Hacettepe Üniversitesi">
+    <!-- Tailwind CSS ve Inter Fontu -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col justify-center items-center p-4">
+
+    <!-- Ana Konteyner -->
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+        <!-- Başlık Bölümü -->
+        <header class="bg-blue-600 text-white p-6 md:p-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">TÜBİTAK 2209-A Projesi Sonuçları</h1>
+            <p class="text-base md:text-lg opacity-90">Proje Adı: İndüksiyon Motorlarının Temel Hesapları ve Daire Diyagramının Elde Edilmesi İçin Bir Mobil Cihaz Uygulaması Gerçekleştirilmesi</p>
+        </header>
+
+        <!-- İçerik Bölümü -->
+        <main class="p-6 md:p-10 text-gray-800">
+            <!-- Proje Açıklaması -->
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Proje Özeti</h2>
+                <p class="leading-relaxed mb-4">
+                    Bu proje, TÜBİTAK-2209-A programı desteğiyle, indüksiyon motorlarının performans analizlerini kolaylaştırmak amacıyla gerçekleştirilmiştir. Çalışma kapsamında, motorların temel parametre hesaplamalarını ve daire diyagramı çizimlerini mümkün kılan bir mobil uygulama ve web tabanlı bir arayüz geliştirilmiştir.
+                </p>
+                <p class="leading-relaxed">
+                    Geliştirilen bu yazılımlar, deneysel verilerin kullanılmasıyla motor verimi ve kayıp analizlerinin hızlı ve doğru bir şekilde yapılmasını sağlamakta, böylece enerji verimliliği ve sürdürülebilirlik araştırmalarına bilimsel bir katkı sunmaktadır.
+                </p>
+            </section>
+
+            <!-- Uygulama ve Web Sayfası Bağlantıları -->
+            <section class="grid md:grid-cols-2 gap-6 mb-8">
+                <!-- Mobil Uygulama Kartı -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <!-- Mobil Cihaz Simgesi -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15.5 1h-8c-1.38 0-2.5 1.12-2.5 2.5v17c0 1.38 1.12 2.5 2.5 2.5h8c1.38 0 2.5-1.12 2.5-2.5v-17c0-1.38-1.12-2.5-2.5-2.5zm1 19.5c0 .28-.22.5-.5.5h-7c-.28 0-.5-.22-.5-.5v-13h8v13zM16 4.5H8v-1h8v1z"/>
+                        </svg>
+                        <h3 class="text-xl font-semibold text-gray-700">Mobil Uygulama Çıktısı</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">
+                        Motor hesaplamalarına yönelik olarak geliştirilen mobil uygulama, deneysel verilerin analizi için bir araç sunmaktadır.
+                    </p>
+                    <a href="#" id="apk-download" onclick="alert('Bu bir demo bağlantısıdır. Gerçek dosya buraya yüklenecektir.');" class="inline-block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-300 transform hover:scale-105">
+                        .apk Dosyasını İndir
+                    </a>
+                </div>
+
+                <!-- Web Sayfası Kartı -->
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <!-- Web Sayfası Simgesi -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm0 15c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7zm-2-12c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm4 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z"/>
+                        </svg>
+                        <h3 class="text-xl font-semibold text-gray-700">İnteraktif Web Sayfası</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">
+                        "Interactive Asynchronous Motor Circle Diagram" başlıklı web sayfası, motor performansının daire diyagramı üzerinden görselleştirilmesini sağlar.
+                    </p>
+                    <a href="#" id="webpage-link" onclick="alert('Bu bir demo bağlantısıdır. Gerçek sayfa buraya bağlanacaktır.');" class="inline-block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-300 transform hover:scale-105">
+                        Web Sayfasını Ziyaret Et
+                    </a>
+                </div>
+            </section>
+
+            <!-- Ekran Görüntüleri Bölümü -->
+            <section class="mt-8">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Uygulamadan Ekran Görüntüleri</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Ekran Görüntüsü 1 -->
+                    <div class="bg-gray-50 rounded-xl overflow-hidden shadow-sm">
+                        <img src="https://googleusercontent.com/file_content/1" alt="Uygulama Ana Sayfa" class="w-full h-auto object-cover rounded-t-xl">
+                        <div class="p-4">
+                            <h4 class="font-semibold text-lg text-gray-700">Ana Menü</h4>
+                            <p class="text-sm text-gray-600 mt-1">Uygulamanın ana sayfasından güç hesaplama ve daire diyagramı bölümlerine ulaşabilirsiniz.</p>
+                        </div>
+                    </div>
+                    <!-- Ekran Görüntüsü 2 -->
+                    <div class="bg-gray-50 rounded-xl overflow-hidden shadow-sm">
+                        <img src="https://googleusercontent.com/file_content/2" alt="Güç Hesaplama Ekranı" class="w-full h-auto object-cover rounded-t-xl">
+                        <div class="p-4">
+                            <h4 class="font-semibold text-lg text-gray-700">Güç ve Verim Hesapları</h4>
+                            <p class="text-sm text-gray-600 mt-1">Gerekli motor parametrelerini girerek elektriksel ve mekanik güç ile verim sınıfını hesaplayın.</p>
+                        </div>
+                    </div>
+                    <!-- Ekran Görüntüsü 3 -->
+                    <div class="bg-gray-50 rounded-xl overflow-hidden shadow-sm">
+                        <img src="https://googleusercontent.com/file_content/3" alt="Daire Diyagramı Ekranı" class="w-full h-auto object-cover rounded-t-xl">
+                        <div class="p-4">
+                            <h4 class="font-semibold text-lg text-gray-700">Daire Diyagramı Hesapları</h4>
+                            <p class="text-sm text-gray-600 mt-1">Boşta ve kısa devre deney verilerini girerek motorun daire diyagramı için gerekli değerleri bulun.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Alt Bilgi (Footer) -->
+        <footer class="bg-gray-200 text-center text-gray-600 p-4 md:p-6">
+            <p>&copy; 2025 TÜBİTAK-2209-A Projesi <br>
+Hacettepe Üniversitesi Ankara Sanayi Odası 1.OSB Meslek Yüksek Okulu <br>
+Tüm hakları saklıdır.</p>
+        </footer>
+    </div>
+</body>
+</html>
