@@ -1,0 +1,557 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-key="pageTitle">Interactive Induction Motors Circle Diagram</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        canvas {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        .btn {
+            transition: all 0.2s ease;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .lang-button {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .lang-button.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .lang-button:not(.active):hover {
+            background-color: #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4 relative">
+
+    <!-- Language Switcher -->
+    <div class="absolute top-4 right-4 flex space-x-2">
+        <button id="langEnBtn" class="lang-button active">EN</button>
+        <button id="langTrBtn" class="lang-button">TR</button>
+    </div>
+
+    <div class="w-full max-w-6xl bg-white p-6 md:p-8 rounded-xl shadow-lg">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800" data-lang-key="mainTitle">Interactive Induction Motor Circle Diagram</h1>
+            <p class="text-gray-600 mt-2" data-lang-key="mainDescription">Enter the data and start the drawing animation.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Control Panel -->
+            <div class="lg:col-span-1 bg-gray-50 p-5 rounded-lg border">
+                <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2" data-lang-key="controlPanelTitle">Control Panel</h2>
+                
+                <!-- Data Input Form -->
+                <form id="dataForm" class="space-y-4">
+                    <div>
+                        <h3 class="font-medium text-gray-600 mb-2" data-lang-key="noLoadTestTitle">No-Load Test</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <label for="v0">V<sub>0</sub> (V)</label>
+                            <input type="number" id="v0" value="400" class="p-1 border rounded w-full">
+                            <label for="i0">I<sub>0</sub> (A)</label>
+                            <input type="number" id="i0" value="8" class="p-1 border rounded w-full">
+                            <label for="w0">W<sub>0</sub> (W)</label>
+                            <input type="number" id="w0" value="1600" class="p-1 border rounded w-full">
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-600 mb-2" data-lang-key="shortCircuitTestTitle">Short-Circuit Test</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <label for="vsc">V<sub>sc</sub> (V)</label>
+                            <input type="number" id="vsc" value="200" class="p-1 border rounded w-full">
+                            <label for="isc">I<sub>sc</sub> (A)</label>
+                            <input type="number" id="isc" value="14" class="p-1 border rounded w-full">
+                            <label for="wsc">W<sub>sc</sub> (W)</label>
+                            <input type="number" id="wsc" value="2000" class="p-1 border rounded w-full">
+                        </div>
+                    </div>
+                     <div>
+                        <h3 class="font-medium text-gray-600 mb-2" data-lang-key="simulationSettingsTitle">Simulation Settings</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm items-center">
+                            <label for="speed" data-lang-key="speedLabel">Speed (ms)</label>
+                            <input type="range" id="speed" min="200" max="2000" value="1000" class="w-full">
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Control Buttons -->
+                <div class="mt-6 space-y-2">
+                    <button id="startButton" class="btn w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700" data-lang-key="startButton">Start Simulation</button>
+                    <button id="pauseResumeButton" class="btn w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600" disabled data-lang-key="pauseResumeButton">Pause</button>
+                </div>
+                
+                <!-- Status Indicator -->
+                <div id="status" class="mt-4 text-center text-sm text-gray-500 h-12 p-2 bg-gray-200 rounded-lg flex items-center justify-center" data-lang-key="initialStatus">
+                    Waiting to start...
+                </div>
+
+                <!-- Calculated Values -->
+                <div class="mt-6 p-4 bg-gray-100 rounded-lg border">
+                    <h3 class="text-base font-semibold text-gray-700 mb-3 border-b pb-2" data-lang-key="calculatedValuesTitle">Calculated Values</h3>
+                    <div class="space-y-1 text-sm text-gray-700">
+                        <p><span data-lang-key="cosPhi0Label">No-Load Power Factor (cosφ<sub>0</sub>)</span>: <span id="display_cos_phi0" class="font-medium text-gray-900">N/A</span></p>
+                        <p><span data-lang-key="phi0DegLabel">No-Load Angle (φ<sub>0</sub>)</span>: <span id="display_phi0_deg" class="font-medium text-gray-900">N/A</span> <span data-lang-key="degreesUnit">degrees</span></p>
+                        <p><span data-lang-key="IscnLabel">Nominal Short-Circuit Current (I<sub>scn</sub>)</span>: <span id="display_Iscn" class="font-medium text-gray-900">N/A</span> A</p>
+                        <p><span data-lang-key="cosPhiscLabel">Short-Circuit Power Factor (cosφ<sub>sc</sub>)</span>: <span id="display_cos_phisc" class="font-medium text-gray-900">N/A</span></p>
+                        <p><span data-lang-key="phiscDegLabel">Short-Circuit Angle (φ<sub>sc</sub>)</span>: <span id="display_phisc_deg" class="font-medium text-gray-900">N/A</span> <span data-lang-key="degreesUnit">degrees</span></p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Canvas Area -->
+            <div class="lg:col-span-2">
+                <canvas id="circleDiagramCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. DOM Elements and Global State Variables ---
+        const canvas = document.getElementById('circleDiagramCanvas');
+        const ctx = canvas.getContext('2d');
+        const startButton = document.getElementById('startButton');
+        const pauseResumeButton = document.getElementById('pauseResumeButton');
+        const speedSlider = document.getElementById('speed');
+        const statusDiv = document.getElementById('status');
+        const form = document.getElementById('dataForm');
+
+        const langEnBtn = document.getElementById('langEnBtn');
+        const langTrBtn = document.getElementById('langTrBtn');
+
+        // Display elements for calculated values
+        const displayCosPhi0 = document.getElementById('display_cos_phi0');
+        const displayPhi0Deg = document.getElementById('display_phi0_deg'); 
+        const displayIscn = document.getElementById('display_Iscn');
+        const displayCosPhisc = document.getElementById('display_cos_phisc');
+        const displayPhiscDeg = document.getElementById('display_phisc_deg'); 
+
+        let currentLanguage = 'en'; // Default language
+
+        const translations = {
+            en: {
+                pageTitle: "Interactive Induction Motor Circle Diagram",
+                mainTitle: "Interactive Induction Motor Circle Diagram",
+                mainDescription: "Enter the data and start the drawing animation.",
+                controlPanelTitle: "Control Panel",
+                noLoadTestTitle: "No-Load Test",
+                shortCircuitTestTitle: "Short-Circuit Test",
+                simulationSettingsTitle: "Simulation Settings",
+                speedLabel: "Speed (ms)",
+                startButton: "Start Simulation",
+                pauseResumeButton: "Pause",
+                resumeButton: "Resume",
+                initialStatus: "Waiting to start...",
+                statusOnLoad: "Check data and press the button to start.",
+                statusPaused: "Simulation paused.",
+                statusComplete: "Simulation complete!",
+                statusError: "Error: ",
+                calculatedValuesTitle: "Calculated Values",
+                cosPhi0Label: "No-Load Power Factor (cosφ₀)",
+                phi0DegLabel: "No-Load Angle (φ₀)",
+                IscnLabel: "Nominal Short-Circuit Current (Iscn)",
+                cosPhiscLabel: "Short-Circuit Power Factor (cosφsc)",
+                phiscDegLabel: "Short-Circuit Angle (φsc)",
+                degreesUnit: "degrees",
+                na: "N/A",
+                errorPositiveValues: "Voltage and current values must be positive.",
+                errorNoLoadInvalid: "No-load data invalid (cosφ > 1 or cosφ < -1).",
+                errorShortCircuitInvalid: "Short-circuit data invalid (cosφ > 1 or cosφ < -1).",
+                errorCalculation: "Calculation error. Please check input data.",
+                step1: "Step 1: Axes are being drawn...",
+                step2: "Step 2: No-load vector (OA) is being drawn...",
+                step3: "Step 3: Short-circuit vector (OB) is being drawn...",
+                step4: "Step 4: No-load line is being drawn...",
+                step5: "Step 5: Output line (AB) is being drawn...",
+                step6: "Step 6: Circle center (C) is being found...",
+                step7: "Step 7: Circle arc is being drawn...",
+            },
+            tr: {
+                pageTitle: "İnteraktif Asenkron Motor Daire Diyagramı",
+                mainTitle: "İnteraktif Asenkron Motor Daire Diyagramı",
+                mainDescription: "Verileri girin ve çizim animasyonunu başlatın.",
+                controlPanelTitle: "Kontrol Paneli",
+                noLoadTestTitle: "Boşta Çalışma Deneyi",
+                shortCircuitTestTitle: "Kısa Devre Deneyi",
+                simulationSettingsTitle: "Benzetim Ayarları",
+                speedLabel: "Hız (ms)",
+                startButton: "Benzetimi Başlat",
+                pauseResumeButton: "Durdur",
+                resumeButton: "Devam Et",
+                initialStatus: "Başlatmak için bekliyor...",
+                statusOnLoad: "Başlatmak için verileri kontrol edin ve butona basın.",
+                statusPaused: "Benzetim durduruldu.",
+                statusComplete: "Benzetim tamamlandı!",
+                statusError: "Hata: ",
+                calculatedValuesTitle: "Hesaplanan Değerler",
+                cosPhi0Label: "Boşta Çalışma Güç Faktörü (cosφ₀)",
+                phi0DegLabel: "Boşta Çalışma Açısı (φ₀)",
+                IscnLabel: "Nominal Kısa Devre Akımı (Iscn)",
+                cosPhiscLabel: "Kısa Devre Güç Faktörü (cosφsc)",
+                phiscDegLabel: "Kısa Devre Açısı (φsc)",
+                degreesUnit: "derece",
+                na: "N/A",
+                errorPositiveValues: "Gerilim ve akım değerleri pozitif olmalıdır.",
+                errorNoLoadInvalid: "Boşta çalışma verileri geçersiz (cosφ > 1 veya cosφ < -1).",
+                errorShortCircuitInvalid: "Kısa devre verileri geçersiz (cosφ > 1 veya cosφ < -1).",
+                errorCalculation: "Hesaplama hatası. Lütfen giriş verilerini kontrol edin.",
+                step1: "Adım 1: Eksenler çiziliyor...",
+                step2: "Adım 2: Boşta çalışma vektörü (OA) çiziliyor...",
+                step3: "Adım 3: Kısa devre vektörü (OB) çiziliyor...",
+                step4: "Adım 4: Boşta çalışma hattı çiziliyor...",
+                step5: "Adım 5: Çıkış hattı (AB) çiziliyor...",
+                step6: "Adım 6: Daire merkezi (C) bulunuyor...",
+                step7: "Adım 7: Daire yayı çiziliyor...",
+            }
+        };
+
+        let animationState = {
+            isPaused: false,
+            isRunning: false,
+            currentStep: 0,
+            steps: [],
+            data: {},
+            scale: 1,
+            origin: {x: 0, y: 0},
+            pointA: {x: 0, y: 0},
+            pointB: {x: 0, y: 0},
+            centerC: {x: 0, y: 0},
+        };
+
+        // Canvas boyutunu ayarla
+        const container = canvas.parentElement;
+        const size = Math.min(container.clientWidth, 800);
+        canvas.width = size;
+        canvas.height = size * 0.8;
+        animationState.origin = { x: 60, y: canvas.height - 60 };
+
+        // --- Language Functions ---
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.documentElement.lang = lang; // Update HTML lang attribute
+            updateTextContent();
+            updateButtonStates();
+            // Re-define animation steps to update their descriptions
+            defineAnimationSteps(); 
+            // Update status message if animation is not running
+            if (!animationState.isRunning) {
+                updateStatus(translations[currentLanguage].statusOnLoad);
+            } else if (animationState.isPaused) {
+                updateStatus(translations[currentLanguage].statusPaused);
+            }
+            // Update pause/resume button text immediately
+            if (animationState.isPaused) {
+                pauseResumeButton.textContent = translations[currentLanguage].resumeButton;
+            } else {
+                pauseResumeButton.textContent = translations[currentLanguage].pauseResumeButton;
+            }
+        }
+
+        function updateTextContent() {
+            document.querySelectorAll('[data-lang-key]').forEach(element => {
+                const key = element.getAttribute('data-lang-key');
+                if (translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+            // Specific updates for buttons that change text based on state
+            if (animationState.isRunning) {
+                 startButton.textContent = translations[currentLanguage].startButton; // This will become "Yeniden Başlat" or "Restart"
+            } else {
+                startButton.textContent = translations[currentLanguage].startButton;
+            }
+            if (animationState.isPaused) {
+                pauseResumeButton.textContent = translations[currentLanguage].resumeButton;
+            } else {
+                pauseResumeButton.textContent = translations[currentLanguage].pauseResumeButton;
+            }
+            // Update title separately as it's not always in data-lang-key loop
+            document.title = translations[currentLanguage].pageTitle;
+        }
+
+        function updateButtonStates() {
+            langEnBtn.classList.remove('active');
+            langTrBtn.classList.remove('active');
+            if (currentLanguage === 'en') {
+                langEnBtn.classList.add('active');
+            } else {
+                langTrBtn.classList.add('active');
+            }
+        }
+
+        // --- 2. Helper Functions ---
+        const sleep = ms => new Promise(res => setTimeout(res, ms));
+        
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function updateStatus(message) {
+            statusDiv.innerHTML = message;
+        }
+
+        // Function to update displayed calculated values
+        function updateCalculatedValues(cos_phi0, phi0_rad, Iscn, cos_phisc, phisc_rad) {
+            displayCosPhi0.textContent = cos_phi0.toFixed(4);
+            displayPhi0Deg.textContent = (phi0_rad * 180 / Math.PI).toFixed(4);
+            displayIscn.textContent = Iscn.toFixed(4);
+            displayCosPhisc.textContent = cos_phisc.toFixed(4);
+            displayPhiscDeg.textContent = (phisc_rad * 180 / Math.PI).toFixed(4);
+        }
+
+        // Function to reset displayed calculated values
+        function resetCalculatedValues() {
+            displayCosPhi0.textContent = translations[currentLanguage].na;
+            displayPhi0Deg.textContent = translations[currentLanguage].na;
+            displayIscn.textContent = translations[currentLanguage].na;
+            displayCosPhisc.textContent = translations[currentLanguage].na;
+            displayPhiscDeg.textContent = translations[currentLanguage].na;
+        }
+
+        // --- 3. Drawing Functions (Each is an animation step) ---
+        
+        function drawAxes() {
+            ctx.beginPath();
+            ctx.strokeStyle = '#9ca3af';
+            ctx.lineWidth = 1;
+            ctx.font = '12px Inter';
+            // X Axis
+            ctx.moveTo(0, animationState.origin.y);
+            ctx.lineTo(canvas.width, animationState.origin.y);
+            // Y Axis
+            ctx.moveTo(animationState.origin.x, 0);
+            ctx.lineTo(animationState.origin.x, canvas.height);
+            ctx.stroke();
+            ctx.fillStyle = 'black';
+            ctx.fillText('O', animationState.origin.x - 15, animationState.origin.y + 15);
+            ctx.fillText('V', animationState.origin.x + 5, 15);
+        }
+
+        function drawVector(current, angle_rad, color, label) {
+            const length = current * animationState.scale;
+            const canvas_angle = Math.PI / 2 - angle_rad;
+            const endX = animationState.origin.x + length * Math.cos(canvas_angle);
+            const endY = animationState.origin.y - length * Math.sin(canvas_angle);
+
+            ctx.beginPath();
+            ctx.moveTo(animationState.origin.x, animationState.origin.y);
+            ctx.lineTo(endX, endY);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            
+            ctx.fillStyle = color;
+            ctx.font = '14px Inter';
+            ctx.fillText(label, endX + 8, endY);
+            return { x: endX, y: endY };
+        }
+
+        function drawLine(p1, p2, color, style = 'solid', width = 1) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            if (style === 'dashed') {
+                ctx.setLineDash([5, 5]);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawPoint(p, label) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 4, 0, 2 * Math.PI);
+            ctx.fillStyle = 'black';
+            ctx.fill();
+            ctx.font = '14px Inter';
+            ctx.fillText(label, p.x + 8, p.y - 8);
+        }
+
+        // --- 4. Animation Steps Definition ---
+        
+        function defineAnimationSteps() {
+            animationState.steps = [
+                { desc: translations[currentLanguage].step1, func: () => {
+                    drawAxes();
+                }},
+                { desc: translations[currentLanguage].step2, func: () => {
+                    const { I0, phi0_rad } = animationState.data;
+                    animationState.pointA = drawVector(I0, phi0_rad, '#3b82f6', 'A');
+                }},
+                { desc: translations[currentLanguage].step3, func: () => {
+                    const { Iscn, phisc_rad } = animationState.data;
+                    animationState.pointB = drawVector(Iscn, phisc_rad, '#ef4444', 'B');
+                }},
+                { desc: translations[currentLanguage].step4, func: () => {
+                    const noLoadLineP2 = { x: canvas.width, y: animationState.pointA.y };
+                    drawLine(animationState.pointA, noLoadLineP2, '#a3a3a3', 'dashed');
+                }},
+                { desc: translations[currentLanguage].step5, func: () => { 
+                    drawLine(animationState.pointA, animationState.pointB, '#16a34a', 'solid', 2);
+                }},
+                { desc: translations[currentLanguage].step6, func: () => {
+                    const { pointA, pointB } = animationState;
+                    const midAB = { x: (pointA.x + pointB.x) / 2, y: (pointA.y + pointB.y) / 2 };
+                    const slopeAB = (pointB.y - pointA.y) / (pointB.x - pointA.x);
+                    const perpSlope = -1 / slopeAB;
+                    // Calculate centerX such that the line from midAB to centerC is perpendicular to AB
+                    // and centerC.y is the same as pointA.y (no-load line)
+                    const centerX = midAB.x + (pointA.y - midAB.y) / perpSlope;
+                    animationState.centerC = { x: centerX, y: pointA.y };
+                    drawLine(midAB, animationState.centerC, '#a3a3a3', 'dashed');
+                    drawPoint(animationState.centerC, 'C');
+                }},
+                { desc: translations[currentLanguage].step7, func: () => {
+                    const { centerC, pointA } = animationState;
+                    const radius = Math.sqrt(Math.pow(centerC.x - pointA.x, 2) + Math.pow(centerC.y - pointA.y, 2));
+                    ctx.beginPath();
+                    // Draw only the upper half of the circle
+                    // Start from the right side (0 radians) and go counter-clockwise to the left side (PI radians)
+                    ctx.arc(centerC.x, centerC.y, radius, 0, Math.PI, true); 
+                    ctx.strokeStyle = '#f97316';
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+                }},
+                { desc: translations[currentLanguage].statusComplete, func: () => {
+                    // No more text labels for lines
+                }}
+            ];
+        }
+
+        // --- 5. Main Control Logic ---
+        
+        async function runAnimation() {
+            animationState.isRunning = true;
+            startButton.disabled = true;
+            pauseResumeButton.disabled = false;
+            pauseResumeButton.textContent = translations[currentLanguage].pauseResumeButton;
+
+            while (animationState.currentStep < animationState.steps.length) {
+                if (animationState.isPaused) {
+                    await sleep(100);
+                    continue;
+                }
+
+                const step = animationState.steps[animationState.currentStep];
+                updateStatus(step.desc);
+                step.func();
+                
+                animationState.currentStep++;
+                await sleep(speedSlider.value);
+            }
+
+            // Animation finished
+            animationState.isRunning = false;
+            startButton.disabled = false;
+            startButton.textContent = translations[currentLanguage].startButton; // This will become "Restart Simulation" or "Yeniden Başlat"
+            pauseResumeButton.disabled = true;
+        }
+
+        function start() {
+            animationState.isRunning = false;
+            animationState.isPaused = false;
+            animationState.currentStep = 0;
+
+            clearCanvas();
+            drawAxes(); // Draw axes at the start to avoid blank screen on error
+            resetCalculatedValues(); // Reset calculated values on start
+
+            try {
+                const V0 = parseFloat(document.getElementById('v0').value);
+                const I0 = parseFloat(document.getElementById('i0').value);
+                const W0 = parseFloat(document.getElementById('w0').value);
+                const Vsc = parseFloat(document.getElementById('vsc').value);
+                const Isc = parseFloat(document.getElementById('isc').value);
+                const Wsc = parseFloat(document.getElementById('wsc').value);
+
+                if (V0 <= 0 || I0 <= 0 || Vsc <= 0 || Isc <= 0) {
+                    throw new Error(translations[currentLanguage].errorPositiveValues);
+                }
+
+                const cos_phi0 = W0 / (Math.sqrt(3) * V0 * I0);
+                if (cos_phi0 > 1 || cos_phi0 < -1) {
+                    throw new Error(translations[currentLanguage].errorNoLoadInvalid);
+                }
+                const phi0_rad = Math.acos(cos_phi0);
+
+                const Iscn = Isc * (V0 / Vsc);
+
+                const cos_phisc = Wsc / (Math.sqrt(3) * Vsc * Isc);
+                if (cos_phisc > 1 || cos_phisc < -1) {
+                    throw new Error(translations[currentLanguage].errorShortCircuitInvalid);
+                }
+                const phisc_rad = Math.acos(cos_phisc);
+                
+                if (isNaN(phi0_rad) || isNaN(phisc_rad) || isNaN(Iscn)) {
+                    throw new Error(translations[currentLanguage].errorCalculation);
+                }
+
+                // Update the displayed calculated values
+                updateCalculatedValues(cos_phi0, phi0_rad, Iscn, cos_phisc, phisc_rad);
+
+                animationState.data = { I0, phi0_rad, Iscn, phisc_rad };
+                animationState.scale = (canvas.width - 2 * animationState.origin.x) / Iscn;
+                
+                defineAnimationSteps(); // Define steps with current language descriptions
+                runAnimation();
+
+            } catch (error) {
+                updateStatus(`${translations[currentLanguage].statusError}${error.message}`);
+                startButton.disabled = false;
+                startButton.textContent = translations[currentLanguage].startButton;
+                pauseResumeButton.disabled = true;
+                resetCalculatedValues(); // Reset values on error
+            }
+        }
+
+        function togglePauseResume() {
+            if (!animationState.isRunning) return;
+
+            animationState.isPaused = !animationState.isPaused;
+            if (animationState.isPaused) {
+                pauseResumeButton.textContent = translations[currentLanguage].resumeButton;
+                updateStatus(translations[currentLanguage].statusPaused);
+            } else {
+                pauseResumeButton.textContent = translations[currentLanguage].pauseResumeButton;
+                // If animation is running and not paused, update status to current step description
+                if (animationState.currentStep > 0 && animationState.currentStep <= animationState.steps.length) {
+                    updateStatus(animationState.steps[animationState.currentStep - 1].desc);
+                }
+            }
+        }
+
+        // --- 6. Event Listeners ---
+        startButton.addEventListener('click', start);
+        pauseResumeButton.addEventListener('click', togglePauseResume);
+        langEnBtn.addEventListener('click', () => setLanguage('en'));
+        langTrBtn.addEventListener('click', () => setLanguage('tr'));
+
+        window.addEventListener('load', () => {
+            setLanguage('en'); // Set default language on load
+            drawAxes();
+            updateStatus(translations[currentLanguage].statusOnLoad);
+            resetCalculatedValues(); // Reset values on initial load
+        });
+
+    </script>
+</body>
+</html>
