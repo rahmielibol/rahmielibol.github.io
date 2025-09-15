@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Türkçe ve İngilizce arama motorları için SEO meta etiketleri -->
+    <meta name="description" content="Motor verim sınıflandırması (IE1, IE2, IE3) hesaplayın. Motor gücü ve nominal verim değerlerine göre motorunuzun verim sınıfını belirleyin ve grafik üzerinde görselleştirin.">
+    <meta name="keywords" content="motor verimi, verimlilik sınıflandırması, IE1, IE2, IE3, motor gücü, nominal verim, motor, verimlilik, elektrik motoru, motor efficiency, efficiency classification, motor power, nominal efficiency, electric motor">
+    <meta name="language" content="Turkish">
+
+    <title>Motor Verim Sınıflandırması</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.0"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-8">
+
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg max-w-sm md:max-w-2xl w-full">
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center text-gray-800">Motor Verim Sınıflandırması</h1>
+        <p class="mb-4 md:mb-6 text-center text-gray-600 text-sm md:text-base">Motorun verim sınıfını belirlemek için güç ve nominal verim değerlerini girin.</p>
+
+        <div class="space-y-4 mb-6">
+            <div>
+                <label for="power" class="block text-sm font-medium text-gray-700">Motor Gücü (kW)</label>
+                <input type="number" id="power" placeholder="Örn: 5.5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+            </div>
+            <div>
+                <label for="efficiency" class="block text-sm font-medium text-gray-700">Nominal Verim (%)</label>
+                <input type="number" id="efficiency" placeholder="Örn: 92.5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+            </div>
+            <button onclick="calculateEfficiency()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out shadow-md">Sınıflandırmayı Göster</button>
+            
+        </div>
+
+        <div id="result" class="mt-6">
+            <h2 id="efficiencyClass" class="text-lg md:text-2xl font-semibold text-center mb-4"></h2>
+            <div class="relative">
+                <canvas id="efficiencyChart" class="w-full h-auto"></canvas>
+            </div>
+        </div>
+        
+        <!-- Daire diyagramı sayfasına yönlendiren link -->
+        <a href="cd.html" class="block text-center w-full bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-150 ease-in-out shadow-md mt-6">Daire Diyagramı Hesaplama Sayfasına Git</a>
+    </div>
+
+    <script>
+        // Chart.js verisini ve ayarlarını tanımlıyoruz
+        const chartData = {
+            labels: [],
+            datasets: [
+                // IE3 Üst Sınır eğrisi (Mavi bandı doldurmak için)
+                {
+                    label: 'IE3',
+                    data: [],
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: '1', // Sonraki veri setine (IE2) kadar doldur
+                    order: 1,
+                },
+                // IE2 Üst Sınır eğrisi (Yeşil bandı doldurmak için)
+                {
+                    label: 'IE2',
+                    data: [],
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: '2', // Sonraki veri setine (IE1) kadar doldur
+                    order: 2,
+                },
+                // IE1 Üst Sınır eğrisi (Turuncu bandı doldurmak için)
+                {
+                    label: 'IE1',
+                    data: [],
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: '3', // Sonraki veri setine (IE1 Alt Sınır) kadar doldur
+                    order: 3,
+                },
+                // IE1 Alt Sınır eğrisi
+                {
+                    label: 'IE1 Alt Sınır',
+                    data: [],
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: false,
+                    order: 4,
+                },
+                // Kullanıcının Girdiği Nokta
+                {
+                    label: 'Girdiğiniz Nokta',
+                    data: [],
+                    backgroundColor: 'rgba(255, 0, 0, 1)',
+                    borderColor: 'rgba(255, 0, 0, 1)',
+                    borderWidth: 3,
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    type: 'scatter',
+                    tension: 0.4,
+                    order: 0,
+                }]
+        };
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'logarithmic',
+                    title: {
+                        display: true,
+                        text: 'Motor Çıkış Gücü (kW)',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    min: 0.1,
+                    max: 1000,
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return value.toFixed(1);
+                        }
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Nominal Verim (%)',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    min: 70,
+                    max: 100,
+                    ticks: {
+                        stepSize: 5
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                annotation: {
+                    annotations: [{
+                        type: 'point',
+                        id: 'inputPoint',
+                        xValue: null,
+                        yValue: null,
+                        radius: 8,
+                        backgroundColor: 'red',
+                        borderColor: 'white',
+                        borderWidth: 2,
+                        label: {
+                            content: (ctx) => `(${ctx.element.x.toFixed(1)} kW, ${ctx.element.y.toFixed(1)}%)`,
+                            display: false,
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            color: 'white',
+                            position: 'top',
+                            yAdjust: -15,
+                        },
+                        display: (ctx) => ctx.chart.data.datasets[4].data.length > 0,
+                    }]
+                }
+            }
+        };
+
+        const ctx = document.getElementById('efficiencyChart').getContext('2d');
+        const efficiencyChart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: chartOptions
+        });
+
+        // Verim verilerini manuel olarak ekliyoruz
+        const ie1LowerBound = [
+            { x: 0.75, y: 72 }, { x: 1.1, y: 75 }, { x: 1.5, y: 77 }, { x: 2.2, y: 79 }, { x: 3, y: 81 },
+            { x: 4, y: 82 }, { x: 5.5, y: 84 }, { x: 7.5, y: 85 }, { x: 11, y: 86.5 }, { x: 15, y: 87.5 },
+            { x: 18.5, y: 88.5 }, { x: 22, y: 89 }, { x: 30, y: 90 }, { x: 37, y: 90.5 }, { x: 45, y: 91 },
+            { x: 55, y: 91.5 }, { x: 75, y: 92.5 }, { x: 90, y: 93 }, { x: 110, y: 93.5 }, { x: 132, y: 94 },
+            { x: 160, y: 94.5 }, { x: 200, y: 95 }, { x: 250, y: 95.5 }, { x: 315, y: 96 }
+        ];
+
+        const ie1UpperBound = [
+            { x: 0.75, y: 80 }, { x: 1.1, y: 82.5 }, { x: 1.5, y: 84 }, { x: 2.2, y: 85.5 }, { x: 3, y: 86.5 },
+            { x: 4, y: 87.5 }, { x: 5.5, y: 88.5 }, { x: 7.5, y: 89.5 }, { x: 11, y: 90.5 }, { x: 15, y: 91.5 },
+            { x: 18.5, y: 92 }, { x: 22, y: 92.5 }, { x: 30, y: 93 }, { x: 37, y: 93.5 }, { x: 45, y: 94 },
+            { x: 55, y: 94.5 }, { x: 75, y: 95 }, { x: 90, y: 95.5 }, { x: 110, y: 96 }, { x: 132, y: 96.5 },
+            { x: 160, y: 96.8 }, { x: 200, y: 97.2 }, { x: 250, y: 97.5 }, { x: 315, y: 97.8 }
+        ];
+
+        const ie2UpperBound = [
+            { x: 0.75, y: 82 }, { x: 1.1, y: 84 }, { x: 1.5, y: 85.5 }, { x: 2.2, y: 87 }, { x: 3, y: 88 },
+            { x: 4, y: 89 }, { x: 5.5, y: 90 }, { x: 7.5, y: 91 }, { x: 11, y: 92 }, { x: 15, y: 92.5 },
+            { x: 18.5, y: 93 }, { x: 22, y: 93.5 }, { x: 30, y: 94 }, { x: 37, y: 94.5 }, { x: 45, y: 95 },
+            { x: 55, y: 95.5 }, { x: 75, y: 96 }, { x: 90, y: 96.5 }, { x: 110, y: 97 }, { x: 132, y: 97.2 },
+            { x: 160, y: 97.5 }, { x: 200, y: 97.8 }, { x: 250, y: 98 }, { x: 315, y: 98.2 }
+        ];
+
+        const ie3UpperBound = [
+            { x: 0.75, y: 84 }, { x: 1.1, y: 85.5 }, { x: 1.5, y: 87 }, { x: 2.2, y: 88.5 }, { x: 3, y: 89.5 },
+            { x: 4, y: 90.5 }, { x: 5.5, y: 91.5 }, { x: 7.5, y: 92.5 }, { x: 11, y: 93.5 }, { x: 15, y: 94 },
+            { x: 18.5, y: 94.5 }, { x: 22, y: 95 }, { x: 30, y: 95.5 }, { x: 37, y: 96 }, { x: 45, y: 96.5 },
+            { x: 55, y: 96.8 }, { x: 75, y: 97 }, { x: 90, y: 97.2 }, { x: 110, y: 97.5 }, { x: 132, y: 97.8 },
+            { x: 160, y: 98 }, { x: 200, y: 98.2 }, { x: 250, y: 98.5 }, { x: 315, y: 98.7 }
+        ];
+
+        // Veri kümelerini grafik verilerine atama
+        chartData.datasets[0].data = ie3UpperBound;
+        chartData.datasets[1].data = ie2UpperBound;
+        chartData.datasets[2].data = ie1UpperBound;
+        chartData.datasets[3].data = ie1LowerBound;
+
+        // Chart'ı güncelliyoruz
+        efficiencyChart.update();
+
+        function findEfficiencyClass(power, efficiency) {
+            // Güç değerine en yakın olan standart noktayı bulmak için
+            const findYValueAtClosestPower = (data, x) => {
+                // Güç değerinden daha düşük veya eşit olan en büyük güç noktasını bul
+                let closestLowerPoint = data.reduce((prev, curr) => 
+                    (curr.x <= x && curr.x > prev.x) ? curr : prev, data[0]);
+                
+                return closestLowerPoint.y;
+            };
+
+            const ie1Min = findYValueAtClosestPower(ie1LowerBound, power);
+            const ie1Max = findYValueAtClosestPower(ie1UpperBound, power);
+            const ie2Max = findYValueAtClosestPower(ie2UpperBound, power);
+            const ie3Max = findYValueAtClosestPower(ie3UpperBound, power);
+
+            if (efficiency >= ie3Max) {
+                return 'IE3';
+            } else if (efficiency >= ie2Max) {
+                return 'IE2';
+            } else if (efficiency >= ie1Max) {
+                return 'IE1';
+            } else if (efficiency >= ie1Min) {
+                return 'IE1';
+            } else {
+                return 'Belirsiz (IE1\'den Düşük)';
+            }
+        }
+
+        function calculateEfficiency() {
+            const powerInput = document.getElementById('power').value;
+            const efficiencyInput = document.getElementById('efficiency').value;
+
+            const power = parseFloat(powerInput);
+            const efficiency = parseFloat(efficiencyInput);
+
+            const resultDiv = document.getElementById('result');
+            const efficiencyClassHeader = document.getElementById('efficiencyClass');
+
+            // Kullanıcıdan geçerli girişleri kontrol etme
+            if (isNaN(power) || isNaN(efficiency) || power <= 0 || efficiency <= 0) {
+                efficiencyClassHeader.textContent = "Lütfen geçerli değerler girin.";
+                return;
+            }
+
+            const efficiencyClass = findEfficiencyClass(power, efficiency);
+            
+            // Sonucu gösterme
+            efficiencyClassHeader.textContent = `Girdiğiniz motor, ${efficiencyClass} sınıfındadır.`;
+            
+            // Grafik verisini güncelleme
+            efficiencyChart.data.datasets[4].data = [{ x: power, y: efficiency }];
+            
+            // Grafik üzerindeki notasyonu güncelleme
+            efficiencyChart.options.plugins.annotation.annotations[0].xValue = power;
+            efficiencyChart.options.plugins.annotation.annotations[0].yValue = efficiency;
+            efficiencyChart.options.plugins.annotation.annotations[0].label.display = true;
+            
+            efficiencyChart.update();
+        }
+    </script>
+</body>
+</html>
