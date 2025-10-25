@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TÜBİTAK 2209-A Projesi: İndüksiyon Motorları Uygulama ve Daire Diyagramı</title>
     <!-- Sayfa Açıklaması (Arama motoru sonuçlarında görünür, daha doğal bir dil kullanıldı) -->
-    <meta name="description" content="TÜBİTAK 2209-A projesi kapsamında geliştirilen indüksiyon motorları hesaplama mobil uygulaması ve interaktif daire diyagramı web sayfası. Proje çıktılarımızı inceleyin.">
+    <meta name="description" content="TÜBİTAK 2209-A projesi kapsamında geliştirilen indüksiyon motorları hesaplama mobil uygulaması. Proje çıktılarımızı inceleyin.">
     <!-- Tailwind CSS ve Inter Fontu -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +43,6 @@
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col justify-center items-center p-4">
-
     <!-- Ana Konteyner -->
     <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
         <!-- Başlık Bölümü -->
@@ -58,10 +57,10 @@
             <section class="mb-8">
                 <h2 class="text-2xl font-semibold text-gray-700 mb-4">Proje Özeti</h2>
                 <p class="leading-relaxed mb-4">
-                    Bu proje, TÜBİTAK-2209-A programı desteğiyle, indüksiyon motorlarının performans analizlerini kolaylaştırmak amacıyla gerçekleştirilmiştir. Çalışma kapsamında, motorların temel parametre hesaplamalarını ve daire diyagramı çizimlerini mümkün kılan bir mobil uygulama ve web tabanlı bir arayüz geliştirilmiştir.
+                    Bu proje, TÜBİTAK-2209-A programı desteğiyle, indüksiyon motorlarının performans analizlerini kolaylaştırmak amacıyla gerçekleştirilmiştir. Çalışma kapsamında, motorların temel parametre hesaplamalarını ve daire diyagramı çizimlerini mümkün kılan bir mobil uygulama geliştirilmiştir.
                 </p>
                 <p class="leading-relaxed">
-                    Geliştirilen bu yazılımlar, deneysel verilerin kullanılmasıyla motor verimi ve kayıp analizlerinin hızlı ve doğru bir şekilde yapılmasını sağlamakta, böylece enerji verimliliği ve sürdürülebilirlik araştırmalarına bilimsel bir katkı sunmaktadır.
+                    Geliştirilen bu yazılım, deneysel verilerin kullanılmasıyla motor verimi ve kayıp analizlerinin hızlı ve doğru bir şekilde yapılmasını sağlamakta, böylece enerji verimliliği ve sürdürülebilirlik araştırmalarına bilimsel bir katkı sunmaktadır.
                 </p>
             </section>
 
@@ -109,11 +108,11 @@
                     </div>
                 </div>
             </section>
-            
-            <!-- Uygulama ve Web Sayfası Bağlantıları -->
-            <section class="grid md:grid-cols-2 gap-6 mb-8">
+
+            <!-- Uygulama Bağlantısı (Tek Kart Olarak Kaldı) -->
+            <section class="grid md:grid-cols-1 gap-6 mb-8">
                 <!-- Mobil Uygulama Kartı -->
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 hover:shadow-lg">
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 hover:shadow-lg mx-auto w-full md:w-3/4"> <!-- Merkezleme ve Genişlik Ayarı Yapıldı -->
                     <div class="flex items-center mb-4">
                         <!-- Mobil Cihaz Simgesi -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500 mr-3" viewBox="0 0 24 24" fill="currentColor">
@@ -135,32 +134,8 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Web Sayfası Kartı -->
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm transition-all duration-300 hover:shadow-lg">
-                    <div class="flex items-center mb-4">
-                        <!-- Web Sayfası Simgesi -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500 mr-3" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm0 15c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7zm-2-12c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm4 0c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z"/>
-                        </svg>
-                        <h3 class="text-xl font-semibold text-gray-700">İnteraktif Web Sayfası</h3>
-                    </div>
-                    <p class="text-gray-600 mb-4">
-                        "İnteraktif İndüksiyon Motorları Daire Diyagramı" başlıklı web sayfası, motor performansının daire diyagramı üzerinden görselleştirilmesini sağlar.
-                    </p>
-                    <div class="flex items-center space-x-2">
-                        <a href="https://rahmielibol.github.io/projects/2209a/01/cd.html" id="cd-link" class="inline-block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-300 transform hover:scale-105">
-                            Web Sayfasını Ziyaret Et
-                        </a>
-                        <button id="copy-cd-link" class="p-3 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors duration-300 transform hover:scale-105" aria-label="Kopyala">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-2m-3-12h3m-3 0V5a2 2 0 00-2-2H9a2 2 0 00-2 2v2m8 0v2H7V7h8z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
             </section>
-
+            
             <!-- Ekran Görüntüleri Bölümü -->
             <section class="mt-8">
                 <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Uygulamadan Ekran Görüntüleri</h2>
@@ -227,17 +202,14 @@
             Tüm hakları saklıdır.</p>
         </footer>
     </div>
-
     <!-- Mesaj Kutusu -->
     <div id="message-box"></div>
-
     <!-- Yukarı Çık Butonu -->
     <button id="back-to-top" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-colors duration-300" aria-label="Sayfanın en üstüne git">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
         </svg>
     </button>
-
     <script>
         /**
          * alert() fonksiyonu yerine kullanıcıya kısa süreli bildirim göstermek için kullanılır.
@@ -280,12 +252,10 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const apkDownloadLink = document.getElementById('apk-download');
-            const cdLink = document.getElementById('cd-link');
             const copyApkButton = document.getElementById('copy-apk-link');
-            const copyCdButton = document.getElementById('copy-cd-link');
             const backToTopButton = document.getElementById('back-to-top');
 
-            // İndirme bağlantılarına tıklandığında mesaj göster.
+            // İndirme bağlantısına tıklandığında mesaj göster.
             apkDownloadLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 showMessage('Mobil cihazınız (Android) için kurulum dosyasıdır.');
@@ -295,22 +265,9 @@
                 }, 500);
             });
 
-            cdLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                showMessage('Daire diyagramı sayfasına bağlanacaktır.');
-                setTimeout(() => {
-                    window.location.href = cdLink.href;
-                }, 500);
-            });
-
-            // Kopyalama butonlarına tıklama olaylarını ekle.
+            // Kopyalama butonuna tıklama olayını ekle.
             copyApkButton.addEventListener('click', () => {
                 const url = apkDownloadLink.href;
-                copyToClipboard(url);
-            });
-
-            copyCdButton.addEventListener('click', () => {
-                const url = cdLink.href;
                 copyToClipboard(url);
             });
 
